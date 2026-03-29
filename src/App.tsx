@@ -162,7 +162,7 @@ function App() {
       {/* ------------------------------------------------------------- */}
       {/* PRINT ONLY VIEW - Optimized for Black & White Worksheets */}
       {/* ------------------------------------------------------------- */}
-      <div className="hidden print:block w-full max-w-[190mm] mx-auto bg-white text-black font-sans p-12 box-border">
+      <div className="hidden print:block w-full max-w-[190mm] h-[260mm] mx-auto bg-white text-black font-sans p-12 box-border flex flex-col">
         
         {/* Worksheet Header */}
         <div className="flex justify-between items-end border-b-4 border-black pb-6 mb-6">
@@ -183,36 +183,38 @@ function App() {
         </div>
 
         {/* Print Sudoku Grid - Crisp B&W Borders */}
-        <div className="w-[150mm] h-[150mm] mx-auto border-4 border-black box-border flex flex-col">
-          {[0, 1, 2].map((blockRow) => (
-            <div key={`p-brow-${blockRow}`} className="flex-1 flex border-b-4 border-black last:border-b-0">
-              {[0, 1, 2].map((blockCol) => (
-                <div key={`p-bcol-${blockCol}`} className="flex-1 flex flex-col border-r-4 border-black last:border-r-0">
-                  {[0, 1, 2].map((row) => (
-                    <div key={`p-row-${row}`} className="flex-1 flex border-b-[1px] border-black last:border-b-0">
-                      {[0, 1, 2].map((col) => {
-                        const r = blockRow * 3 + row;
-                        const c = blockCol * 3 + col;
-                        const isClue = puzzle[r]?.[c] !== 0;
-                        const displayVal = showSolution ? solution[r]?.[c] : puzzle[r]?.[c];
-                        
-                        return (
-                          <div
-                            key={`p-${r}-${c}`}
-                            className={`flex-1 flex items-center justify-center border-r-[1px] border-black last:border-r-0 text-5xl font-black
-                              ${!isClue && showSolution ? 'text-gray-400 italic' : 'text-black'}
-                            `}
-                          >
-                            {displayVal !== 0 ? displayVal : ''}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          ))}
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <div className="w-[150mm] h-[150mm] border-4 border-black box-border flex flex-col">
+            {[0, 1, 2].map((blockRow) => (
+              <div key={`p-brow-${blockRow}`} className="flex-1 flex border-b-4 border-black last:border-b-0">
+                {[0, 1, 2].map((blockCol) => (
+                  <div key={`p-bcol-${blockCol}`} className="flex-1 flex flex-col border-r-4 border-black last:border-r-0">
+                    {[0, 1, 2].map((row) => (
+                      <div key={`p-row-${row}`} className="flex-1 flex border-b-[1px] border-black last:border-b-0">
+                        {[0, 1, 2].map((col) => {
+                          const r = blockRow * 3 + row;
+                          const c = blockCol * 3 + col;
+                          const isClue = puzzle[r]?.[c] !== 0;
+                          const displayVal = showSolution ? solution[r]?.[c] : puzzle[r]?.[c];
+                          
+                          return (
+                            <div
+                              key={`p-${r}-${c}`}
+                              className={`flex-1 flex items-center justify-center border-r-[1px] border-black last:border-r-0 text-5xl font-black
+                                ${!isClue && showSolution ? 'text-gray-400 italic' : 'text-black'}
+                              `}
+                            >
+                              {displayVal !== 0 ? displayVal : ''}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Worksheet Footer */}
