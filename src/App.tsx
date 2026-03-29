@@ -146,7 +146,7 @@ function App() {
 
         {/* Footer */}
         <footer className="mt-16 pt-8 border-t-2 border-slate-50 text-center text-slate-400 font-bold">
-          <p className="text-xs uppercase tracking-[0.2em] mb-2 opacity-60">Version 0.1.0</p>
+          <p className="text-xs uppercase tracking-[0.2em] mb-2 opacity-60">Version 0.1.1</p>
           <p className="text-lg">
             Vibe-Coded by{" "}
             <a 
