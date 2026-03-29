@@ -37,7 +37,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-sky-100 py-10 px-4 font-sans text-slate-800 print:bg-white print:py-0 print:px-0 print:h-screen print:overflow-hidden print:p-12">
+    <div className="min-h-screen bg-sky-100 py-10 px-4 font-sans text-slate-800 print:bg-white print:p-0 print:m-0">
       
       {/* Screen UI Container */}
       <div className="max-w-4xl mx-auto bg-white rounded-[2.5rem] shadow-[0_20px_0_rgb(186,230,253)] p-8 sm:p-12 border-4 border-sky-200 print:hidden">
@@ -148,10 +148,10 @@ function App() {
       {/* ------------------------------------------------------------- */}
       {/* PRINT ONLY VIEW - Optimized for Black & White Worksheets */}
       {/* ------------------------------------------------------------- */}
-      <div className="hidden print:block w-full max-w-[190mm] mx-auto bg-white text-black font-sans break-inside-avoid break-after-avoid">
+      <div className="hidden print:block w-full max-w-[190mm] mx-auto bg-white text-black font-sans p-12 box-border">
         
         {/* Worksheet Header */}
-        <div className="flex justify-between items-end border-b-4 border-black pb-6 mb-8">
+        <div className="flex justify-between items-end border-b-4 border-black pb-6 mb-6">
           <div>
             <h1 className="text-6xl font-black uppercase tracking-tight m-0 p-0 leading-none">KIDOKU</h1>
             <p className="text-2xl font-bold mt-2">Level: <span className="uppercase">{difficulty}</span></p>
@@ -169,7 +169,7 @@ function App() {
         </div>
 
         {/* Print Sudoku Grid - Crisp B&W Borders */}
-        <div className="w-[160mm] h-[160mm] mx-auto border-4 border-black box-border flex flex-col">
+        <div className="w-[150mm] h-[150mm] mx-auto border-4 border-black box-border flex flex-col">
           {[0, 1, 2].map((blockRow) => (
             <div key={`p-brow-${blockRow}`} className="flex-1 flex border-b-4 border-black last:border-b-0">
               {[0, 1, 2].map((blockCol) => (
