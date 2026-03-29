@@ -162,7 +162,7 @@ function App() {
       {/* ------------------------------------------------------------- */}
       {/* PRINT ONLY VIEW - Optimized for Black & White Worksheets */}
       {/* ------------------------------------------------------------- */}
-      <div className="hidden print:block w-full max-w-[190mm] h-[250mm] mx-auto bg-white text-black font-sans p-12 box-border flex flex-col">
+      <div className="hidden print:block w-full max-w-[190mm] mx-auto bg-white text-black font-sans p-12 box-border">
         
         {/* Worksheet Header */}
         <div className="flex justify-between items-end border-b-4 border-black pb-6">
@@ -183,7 +183,7 @@ function App() {
         </div>
 
         {/* Print Sudoku Grid - Crisp B&W Borders */}
-        <div className="my-auto">
+        <div className="py-16">
           <div className="w-[150mm] h-[150mm] mx-auto border-4 border-black box-border flex flex-col">
             {[0, 1, 2].map((blockRow) => (
               <div key={`p-brow-${blockRow}`} className="flex-1 flex border-b-4 border-black last:border-b-0">
