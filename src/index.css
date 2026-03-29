@@ -9,19 +9,21 @@
       size: auto;
     }
     html, body {
-      height: 100%;
-      width: 100%;
       margin: 0 !important;
       padding: 0 !important;
-      overflow: hidden;
     }
     body {
       print-color-adjust: exact;
       -webkit-print-color-adjust: exact;
+      background-color: white !important;
     }
-    /* Hide everything by default, then show our specific print view */
-    #root > div > *:not(.print\:block) {
+    /* Hide screen-only elements */
+    .print\:hidden {
       display: none !important;
+    }
+    /* Force print-only elements to show */
+    .print\:block {
+      display: block !important;
     }
   }
 }
