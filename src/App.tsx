@@ -170,7 +170,7 @@ function App() {
             <h1 className="text-6xl font-black uppercase tracking-tight m-0 p-0 leading-none">KIDOKU</h1>
             <p className="text-2xl font-bold mt-2">Level: <span className="uppercase">{difficulty}</span></p>
           </div>
-          <div className="text-right flex flex-col gap-4 w-64">
+          <div className="text-right flex flex-col gap-4 w-80">
             <div className="flex items-end border-b-2 border-black pb-1">
               <span className="font-bold text-lg mr-2">Name:</span>
               <div className="flex-1"></div>
