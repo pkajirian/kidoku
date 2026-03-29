@@ -183,8 +183,8 @@ function App() {
         </div>
 
         {/* Print Sudoku Grid - Crisp B&W Borders */}
-        <div style={{ marginTop: '60mm', marginBottom: '40mm' }}>
-          <div className="w-[150mm] h-[150mm] mx-auto border-4 border-black box-border flex flex-col">
+        <div style={{ marginTop: '35mm', marginBottom: '25mm' }}>
+          <div className="w-[140mm] h-[140mm] mx-auto border-4 border-black box-border flex flex-col">
             {[0, 1, 2].map((blockRow) => (
               <div key={`p-brow-${blockRow}`} className="flex-1 flex border-b-4 border-black last:border-b-0">
                 {[0, 1, 2].map((blockCol) => (
