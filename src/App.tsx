@@ -170,14 +170,14 @@ function App() {
             <h1 className="text-6xl font-black uppercase tracking-tight m-0 p-0 leading-none">KIDOKU</h1>
             <p className="text-2xl font-bold mt-2">Level: <span className="uppercase">{difficulty}</span></p>
           </div>
-          <div className="text-right flex flex-col gap-4 w-80">
+          <div className="text-right flex flex-col gap-4 w-96 pr-24">
             <div className="flex items-end border-b-2 border-black pb-1">
               <span className="font-bold text-lg mr-2">Name:</span>
-              <div className="flex-1"></div>
+              <div className="flex-1 min-w-[120px]"></div>
             </div>
             <div className="flex items-end border-b-2 border-black pb-1">
               <span className="font-bold text-lg mr-2">Date:</span>
-              <div className="flex-1"></div>
+              <div className="flex-1 min-w-[120px]"></div>
             </div>
           </div>
         </div>
