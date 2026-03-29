@@ -37,7 +37,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-sky-100 py-10 px-4 font-sans text-slate-800 print:bg-white print:py-0 print:px-0">
+    <div className="min-h-screen bg-sky-100 py-10 px-4 font-sans text-slate-800 print:bg-white print:py-0 print:px-0 print:h-screen print:overflow-hidden print:p-12">
       
       {/* Screen UI Container */}
       <div className="max-w-4xl mx-auto bg-white rounded-[2.5rem] shadow-[0_20px_0_rgb(186,230,253)] p-8 sm:p-12 border-4 border-sky-200 print:hidden">
@@ -148,7 +148,7 @@ function App() {
       {/* ------------------------------------------------------------- */}
       {/* PRINT ONLY VIEW - Optimized for Black & White Worksheets */}
       {/* ------------------------------------------------------------- */}
-      <div className="hidden print:block w-full max-w-[190mm] mx-auto bg-white text-black font-sans">
+      <div className="hidden print:block w-full max-w-[190mm] mx-auto bg-white text-black font-sans break-inside-avoid break-after-avoid">
         
         {/* Worksheet Header */}
         <div className="flex justify-between items-end border-b-4 border-black pb-6 mb-8">
