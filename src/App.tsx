@@ -162,10 +162,10 @@ function App() {
       {/* ------------------------------------------------------------- */}
       {/* PRINT ONLY VIEW - Optimized for Black & White Worksheets */}
       {/* ------------------------------------------------------------- */}
-      <div className="hidden print:block w-full max-w-[190mm] h-[260mm] mx-auto bg-white text-black font-sans p-12 box-border flex flex-col">
+      <div className="hidden print:block w-full max-w-[190mm] h-[250mm] mx-auto bg-white text-black font-sans p-12 box-border flex flex-col">
         
         {/* Worksheet Header */}
-        <div className="flex justify-between items-end border-b-4 border-black pb-6 mb-6">
+        <div className="flex justify-between items-end border-b-4 border-black pb-6">
           <div>
             <h1 className="text-6xl font-black uppercase tracking-tight m-0 p-0 leading-none">KIDOKU</h1>
             <p className="text-2xl font-bold mt-2">Level: <span className="uppercase">{difficulty}</span></p>
@@ -183,8 +183,8 @@ function App() {
         </div>
 
         {/* Print Sudoku Grid - Crisp B&W Borders */}
-        <div className="flex-1 flex flex-col items-center justify-center">
-          <div className="w-[150mm] h-[150mm] border-4 border-black box-border flex flex-col">
+        <div className="my-auto">
+          <div className="w-[150mm] h-[150mm] mx-auto border-4 border-black box-border flex flex-col">
             {[0, 1, 2].map((blockRow) => (
               <div key={`p-brow-${blockRow}`} className="flex-1 flex border-b-4 border-black last:border-b-0">
                 {[0, 1, 2].map((blockCol) => (
@@ -218,7 +218,7 @@ function App() {
         </div>
 
         {/* Worksheet Footer */}
-        <div className="mt-10 text-center border-t-2 border-black pt-4">
+        <div className="text-center border-t-2 border-black pt-4">
           <p className="text-xl font-bold">Good luck! Every puzzle has only one correct answer.</p>
           {showSolution && (
             <p className="text-lg font-bold text-gray-500 mt-2">Note: Solution is printed in gray italics.</p>
