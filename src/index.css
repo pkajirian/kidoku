@@ -3,6 +3,14 @@
 @tailwind utilities;
 
 @layer base {
+  body {
+    font-family: 'Outfit', sans-serif;
+    transition: background-color 0.4s ease, color 0.4s ease;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
   @media print {
     @page {
       margin: 0;
@@ -11,19 +19,333 @@
     html, body {
       margin: 0 !important;
       padding: 0 !important;
+      font-family: 'Outfit', sans-serif !important;
     }
     body {
       print-color-adjust: exact;
       -webkit-print-color-adjust: exact;
       background-color: white !important;
+      color: black !important;
     }
-    /* Hide screen-only elements */
     .print\:hidden {
       display: none !important;
     }
-    /* Force print-only elements to show */
     .print\:block {
       display: block !important;
     }
   }
+}
+
+/* ==========================================================================
+   THEME STYLES (Cyberpunk, Retro Arcade, Minimalist Glass)
+   ========================================================================== */
+
+/* 1. Minimalist Glass Theme (Default Modern UI) */
+.theme-glass {
+  background: radial-gradient(circle at top left, #e0e7ff, #f3e8ff, #fdf2f8);
+  color: #1e1b4b;
+}
+
+.theme-glass .glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.15);
+}
+
+.theme-glass .grid-container {
+  background: #312e81;
+  border-color: #4338ca;
+}
+
+.theme-glass .grid-cell-empty {
+  background: rgba(255, 255, 255, 0.9);
+  color: #6366f1;
+}
+
+.theme-glass .grid-cell-clue {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.theme-glass .cell-selected {
+  background: #e0e7ff !important;
+  box-shadow: inset 0 0 0 3px #6366f1;
+}
+
+.theme-glass .cell-highlight {
+  background: #f1f5f9;
+}
+
+.theme-glass .btn-primary {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+.theme-glass .btn-secondary {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #e2e8f0;
+  color: #475569;
+}
+
+.theme-glass .btn-active {
+  background: #6366f1 !important;
+  color: white !important;
+}
+
+/* 2. Cyberpunk Neon Theme (For Mature Techy Vibe) */
+.theme-cyber {
+  background: radial-gradient(circle at center, #0b071e 0%, #03000a 100%);
+  color: #00ffcc;
+  font-family: 'Outfit', sans-serif;
+}
+
+.theme-cyber .glass-panel {
+  background: rgba(11, 7, 30, 0.8);
+  border: 2px solid #ff007f;
+  box-shadow: 0 0 25px rgba(255, 0, 127, 0.25), inset 0 0 15px rgba(255, 0, 127, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.theme-cyber .grid-container {
+  background: #03000a;
+  border: 3px solid #ff007f;
+  box-shadow: 0 0 20px rgba(255, 0, 127, 0.4);
+}
+
+.theme-cyber .grid-cell-empty {
+  background: #0d0620;
+  color: #00ffcc;
+  border-color: rgba(255, 0, 127, 0.2);
+  text-shadow: 0 0 8px rgba(0, 255, 204, 0.6);
+}
+
+.theme-cyber .grid-cell-clue {
+  background: #170d35;
+  color: #ffff00;
+  border-color: rgba(255, 0, 127, 0.2);
+  text-shadow: 0 0 8px rgba(255, 255, 0, 0.6);
+}
+
+.theme-cyber .cell-selected {
+  background: rgba(0, 255, 204, 0.15) !important;
+  box-shadow: inset 0 0 10px #00ffcc, 0 0 15px rgba(0, 255, 204, 0.5);
+  color: #ffffff !important;
+}
+
+.theme-cyber .cell-highlight {
+  background: rgba(255, 0, 127, 0.08);
+}
+
+.theme-cyber .btn-primary {
+  background: linear-gradient(135deg, #ff007f, #b800ff);
+  color: white;
+  border: 1px solid #ff007f;
+  box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+}
+
+.theme-cyber .btn-secondary {
+  background: rgba(13, 6, 32, 0.8);
+  border: 1px solid #00ffcc;
+  color: #00ffcc;
+  box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
+}
+
+.theme-cyber .btn-active {
+  background: #00ffcc !important;
+  color: #03000a !important;
+  box-shadow: 0 0 15px rgba(0, 255, 204, 0.6);
+  text-shadow: none;
+}
+
+/* 3. Retro Arcade Theme (Pixel Mode) */
+.theme-retro {
+  background-color: #0a0e08;
+  color: #39ff14;
+  font-family: 'Press Start 2P', monospace;
+  image-rendering: pixelated;
+}
+
+.theme-retro .glass-panel {
+  background: #0a0e08;
+  border: 4px solid #39ff14;
+  box-shadow: 8px 8px 0px #1a3010;
+  border-radius: 0px !important;
+}
+
+.theme-retro .grid-container {
+  background: #020501;
+  border: 4px solid #39ff14;
+  border-radius: 0px !important;
+}
+
+.theme-retro .grid-cell-empty {
+  background: #050a04;
+  color: #39ff14;
+  border: 1px solid #1a3010;
+  border-radius: 0px !important;
+  text-shadow: 0 0 4px #39ff14;
+}
+
+.theme-retro .grid-cell-clue {
+  background: #121e0d;
+  color: #00ffff;
+  border: 1px solid #1a3010;
+  border-radius: 0px !important;
+  text-shadow: 0 0 4px #00ffff;
+}
+
+.theme-retro .cell-selected {
+  background: rgba(57, 255, 20, 0.25) !important;
+  box-shadow: inset 0 0 0 4px #39ff14;
+  color: #ffffff !important;
+  border-radius: 0px !important;
+}
+
+.theme-retro .cell-highlight {
+  background: rgba(57, 255, 20, 0.08);
+}
+
+.theme-retro .btn-primary {
+  background: #39ff14;
+  color: #0a0e08;
+  border: 4px solid #000;
+  box-shadow: 4px 4px 0px #1a3010;
+  font-size: 0.8rem;
+  border-radius: 0px !important;
+}
+
+.theme-retro .btn-secondary {
+  background: #0a0e08;
+  border: 4px solid #39ff14;
+  color: #39ff14;
+  box-shadow: 4px 4px 0px #1a3010;
+  font-size: 0.8rem;
+  border-radius: 0px !important;
+}
+
+.theme-retro .btn-active {
+  background: #00ffff !important;
+  color: #0a0e08 !important;
+  border: 4px solid #000;
+  box-shadow: 4px 4px 0px #1a3010;
+  border-radius: 0px !important;
+}
+
+.theme-retro * {
+  border-radius: 0px !important;
+}
+
+
+/* ==========================================================================
+   ANIMATIONS & TRANSITIONS
+   ========================================================================== */
+
+/* Springy bounce on hover/click */
+.btn-tactile {
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.btn-tactile:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+.btn-tactile:active {
+  transform: translateY(2px) scale(0.97);
+}
+
+/* Shake Animation on Mistakes */
+.animate-shake {
+  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-4px, 0, 0); }
+  20%, 80% { transform: translate3d(8px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-10px, 0, 0); }
+  40%, 60% { transform: translate3d(10px, 0, 0); }
+}
+
+/* Neon Flashing Border for Mistakes */
+.theme-cyber .grid-error-flash {
+  animation: cyber-error 0.5s ease-in-out;
+}
+@keyframes cyber-error {
+  0%, 100% { border-color: #ff007f; box-shadow: 0 0 20px rgba(255, 0, 127, 0.4); }
+  50% { border-color: #ff0000; box-shadow: 0 0 35px #ff0000; }
+}
+
+.theme-retro .grid-error-flash {
+  animation: retro-error 0.5s ease-in-out;
+}
+@keyframes retro-error {
+  0%, 100% { border-color: #39ff14; }
+  50% { border-color: #ff0000; background-color: rgba(255, 0, 0, 0.2); }
+}
+
+.theme-glass .grid-error-flash {
+  animation: glass-error 0.5s ease-in-out;
+}
+@keyframes glass-error {
+  0%, 100% { border-color: #4338ca; }
+  50% { border-color: #ef4444; background-color: rgba(239, 68, 68, 0.1); }
+}
+
+/* Cell Value Placement Pop Animation */
+.animate-pop {
+  animation: cell-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.5) forwards;
+}
+
+@keyframes cell-pop {
+  0% { transform: scale(0.6); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Shimmer Light sweep for line completions */
+.line-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.line-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+  transform: translateX(-100%);
+  animation: shimmer-sweep 0.8s ease-in-out forwards;
+}
+
+@keyframes shimmer-sweep {
+  100% { transform: translateX(100%); }
+}
+
+/* Sparkle Floating Animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(15deg); }
+}
+
+.animate-float-slow {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-float-fast {
+  animation: float 2.5s ease-in-out infinite;
+}
+
+/* CRT Screen Scanline Overlay for Retro Theme */
+.crt-overlay::after {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  z-index: 9999;
+  background-size: 100% 4px, 6px 100%;
+  pointer-events: none;
 }
