@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { SudokuGenerator } from './utils/sudoku';
-import type { Difficulty } from './utils/sudoku';
+import type { Difficulty, GridSize } from './utils/sudoku';
 
 // ==========================================================================
 // PROGRAMMATIC 8-BIT CHIPTUNE SYNTHESIZER (Web Audio API)
@@ -186,6 +186,9 @@ function App() {
   const [userGrid, setUserGrid] = useState<number[][]>([]);
   const [solution, setSolution] = useState<number[][]>([]);
   const [difficulty, setDifficulty] = useState<Difficulty>('Easy');
+  const [gridSize, setGridSize] = useState<GridSize>(9);
+  // Cells per mini-block side: 3 for the classic 9x9, 2 for the 4x4 Mini board.
+  const boxSize = gridSize === 4 ? 2 : 3;
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedCell, setSelectedCell] = useState<{ r: number; c: number } | null>(null);
   
@@ -203,6 +206,40 @@ function App() {
   const [gameStatus, setGameStatus] = useState<'playing' | 'victory' | 'gameover'>('playing');
   const [errorFlash, setErrorFlash] = useState(false);
 
+  // Undo history: snapshots of the board + stats before each move, so one tap
+  // can take back a placement, a clear, a hint, or a mistake (lives included).
+  const [history, setHistory] = useState<{
+    grid: number[][];
+    lives: number;
+    mistakesMade: number;
+    hintsUsed: number;
+  }[]>([]);
+  const pushHistory = () => {
+    setHistory((prev) => {
+      const snapshot = {
+        grid: userGrid.map((row) => [...row]),
+        lives,
+        mistakesMade,
+        hintsUsed,
+      };
+      // Keep the stack bounded so long sessions stay light.
+      return [...prev.slice(-99), snapshot];
+    });
+  };
+  const handleUndo = () => {
+    if (history.length === 0 || isGenerating || isPaused) return;
+    if (gameStatus !== 'playing' && gameStatus !== 'gameover') return;
+    const last = history[history.length - 1];
+    setHistory((prev) => prev.slice(0, -1));
+    setUserGrid(last.grid.map((row) => [...row]));
+    setLives(last.lives);
+    setMistakesMade(last.mistakesMade);
+    setHintsUsed(last.hintsUsed);
+    setErrorFlash(false);
+    if (gameStatus === 'gameover') setGameStatus('playing');
+    synth.playSelect();
+  };
+
   // Sparkles on win
   const [particles, setParticles] = useState<{ id: number; x: number; y: number; color: string; size: number; delay: number }[]>([]);
 
@@ -210,7 +247,7 @@ function App() {
   const timerIntervalRef = useRef<any>(null);
 
   // Generate a new puzzle
-  const generateNewGame = (diff: Difficulty = difficulty) => {
+  const generateNewGame = (diff: Difficulty = difficulty, size: GridSize = gridSize) => {
     setIsGenerating(true);
     setShowSolution(false);
     setSelectedCell(null);
@@ -220,14 +257,16 @@ function App() {
     setHintsUsed(0);
     setMistakesMade(0);
     setGameStatus('playing');
+    setHistory([]);
 
     setTimeout(() => {
-      const { puzzle: newPuzzle, solution: newSolution } = generator.generate(diff);
+      const { puzzle: newPuzzle, solution: newSolution } = generator.generate(diff, size);
       setPuzzle(newPuzzle);
       // userGrid is a deep copy of the puzzle grid
       setUserGrid(newPuzzle.map(row => [...row]));
       setSolution(newSolution);
       setDifficulty(diff);
+      setGridSize(size);
       setIsGenerating(false);
     }, 120);
   };
@@ -252,9 +291,29 @@ function App() {
     };
   }, [gameStatus, isPaused, isGenerating]);
 
+  // Toggle paused screen (declared before the keyboard effect, which uses it)
+  const togglePause = () => {
+    synth.playSelect();
+    setIsPaused(!isPaused);
+  };
+
   // Keyboard navigation & inputs
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Undo: Ctrl/Cmd+Z works even with no cell selected (and after game over).
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        handleUndo();
+        return;
+      }
+
+      // Pause: P toggles pause/resume without needing a selected cell.
+      if (e.key.toLowerCase() === 'p' && !e.metaKey && !e.ctrlKey && gameStatus === 'playing' && !isGenerating) {
+        e.preventDefault();
+        togglePause();
+        return;
+      }
+
       if (gameStatus !== 'playing' || isPaused || isGenerating || !selectedCell) return;
 
       const { r, c } = selectedCell;
@@ -263,24 +322,24 @@ function App() {
       if (e.key === 'ArrowUp') {
         e.preventDefault();
         synth.playSelect();
-        setSelectedCell({ r: r > 0 ? r - 1 : 8, c });
+        setSelectedCell({ r: r > 0 ? r - 1 : gridSize - 1, c });
       } else if (e.key === 'ArrowDown') {
         e.preventDefault();
         synth.playSelect();
-        setSelectedCell({ r: r < 8 ? r + 1 : 0, c });
+        setSelectedCell({ r: r < gridSize - 1 ? r + 1 : 0, c });
       } else if (e.key === 'ArrowLeft') {
         e.preventDefault();
         synth.playSelect();
-        setSelectedCell({ r, c: c > 0 ? c - 1 : 8 });
+        setSelectedCell({ r, c: c > 0 ? c - 1 : gridSize - 1 });
       } else if (e.key === 'ArrowRight') {
         e.preventDefault();
         synth.playSelect();
-        setSelectedCell({ r, c: c < 8 ? c + 1 : 0 });
+        setSelectedCell({ r, c: c < gridSize - 1 ? c + 1 : 0 });
       }
 
-      // Input numbers 1-9
+      // Input numbers 1-9 (1-4 on the Mini board)
       const keyNum = parseInt(e.key);
-      if (keyNum >= 1 && keyNum <= 9) {
+      if (keyNum >= 1 && keyNum <= gridSize) {
         handleCellValueInput(r, c, keyNum);
       }
 
@@ -295,7 +354,7 @@ function App() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [selectedCell, gameStatus, isPaused, isGenerating, puzzle, userGrid, solution]);
+  }, [selectedCell, gameStatus, isPaused, isGenerating, puzzle, userGrid, solution, history, gridSize]);
 
   // Handle cell click
   const handleCellSelect = (r: number, c: number) => {
@@ -307,6 +366,7 @@ function App() {
   // Clear cell
   const handleCellClear = (r: number, c: number) => {
     if (puzzle[r]?.[c] !== 0) return; // cannot clear initial clues
+    pushHistory();
     synth.playPlace();
     const nextGrid = userGrid.map(row => [...row]);
     nextGrid[r][c] = 0;
@@ -317,6 +377,7 @@ function App() {
   const handleCellValueInput = (r: number, c: number, value: number) => {
     if (puzzle[r]?.[c] !== 0) return; // clue cells are locked
 
+    pushHistory();
     const nextGrid = userGrid.map(row => [...row]);
     nextGrid[r][c] = value;
     setUserGrid(nextGrid);
@@ -368,8 +429,8 @@ function App() {
   };
 
   const checkWin = (gridToCheck: number[][]) => {
-    for (let r = 0; r < 9; r++) {
-      for (let c = 0; c < 9; c++) {
+    for (let r = 0; r < gridSize; r++) {
+      for (let c = 0; c < gridSize; c++) {
         if (gridToCheck[r][c] !== solution[r][c]) {
           return false;
         }
@@ -399,6 +460,7 @@ function App() {
 
     if (puzzle[r][c] !== 0) return; // already a clue
 
+    pushHistory();
     synth.playHint();
     const correctVal = solution[r][c];
     const nextGrid = userGrid.map(row => [...row]);
@@ -426,12 +488,6 @@ function App() {
     window.print();
   };
 
-  // Toggle paused screen
-  const togglePause = () => {
-    synth.playSelect();
-    setIsPaused(!isPaused);
-  };
-
   // Calculate victory star rating
   const getStarCount = () => {
     if (mistakesMade === 0 && hintsUsed === 0 && timer < 600) return 3;
@@ -440,7 +496,7 @@ function App() {
   };
 
   return (
-    <div className={`min-h-screen py-6 px-4 print:bg-white print:p-0 print:m-0 theme-${theme} ${theme === 'retro' ? 'crt-overlay' : ''}`}>
+    <div className={`app-shell print:bg-white print:p-0 print:m-0 theme-${theme} ${theme === 'retro' ? 'crt-overlay' : ''}`}>
       
       {/* ------------------------------------------------------------- */}
       {/* DIGITAL GAME DISPLAY */}
@@ -471,7 +527,7 @@ function App() {
             <div className="flex bg-black/20 p-1 rounded-xl border border-white/10">
               <button
                 onClick={() => { synth.playSelect(); setGameMode('numbers'); }}
-                className={`px-4 py-2.5 rounded-xl text-xs md:text-sm font-black transition-all touch-manipulation active:scale-95 ${
+                className={`min-h-[44px] px-4 py-2.5 rounded-xl text-xs md:text-sm font-black transition-all touch-manipulation active:scale-95 ${
                   gameMode === 'numbers' ? 'bg-indigo-600 text-white shadow' : 'opacity-60 hover:opacity-100'
                 }`}
               >
@@ -479,7 +535,7 @@ function App() {
               </button>
               <button
                 onClick={() => { synth.playSelect(); setGameMode('quest'); }}
-                className={`px-4 py-2.5 rounded-xl text-xs md:text-sm font-black transition-all touch-manipulation active:scale-95 ${
+                className={`min-h-[44px] px-4 py-2.5 rounded-xl text-xs md:text-sm font-black transition-all touch-manipulation active:scale-95 ${
                   gameMode === 'quest' ? 'bg-indigo-600 text-white shadow' : 'opacity-60 hover:opacity-100'
                 }`}
               >
@@ -493,13 +549,29 @@ function App() {
                 <button
                   key={t}
                   onClick={() => { synth.playSelect(); setTheme(t); }}
-                  className={`px-4 py-2.5 rounded-xl text-xs md:text-sm font-black capitalize transition-all touch-manipulation active:scale-95 ${
+                  className={`min-h-[44px] px-4 py-2.5 rounded-xl text-xs md:text-sm font-black capitalize transition-all touch-manipulation active:scale-95 ${
                     theme === t ? 'bg-indigo-600 text-white shadow' : 'opacity-60 hover:opacity-100'
                   }`}
                 >
                   {t === 'glass' && '🌐 Glass'}
                   {t === 'cyber' && '🧬 Cyber'}
                   {t === 'retro' && '🕹️ Retro'}
+                </button>
+              ))}
+            </div>
+
+            {/* Grid Size Select */}
+            <div className="flex bg-black/20 p-1 rounded-xl border border-white/10">
+              {([9, 4] as GridSize[]).map((size) => (
+                <button
+                  key={size}
+                  onClick={() => { synth.playSelect(); generateNewGame(difficulty, size); }}
+                  disabled={isGenerating}
+                  className={`min-h-[44px] min-h-[44px] px-4 py-2.5 rounded-xl text-xs md:text-sm font-black transition-all touch-manipulation active:scale-95 ${
+                    gridSize === size ? 'bg-indigo-600 text-white shadow' : 'opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  {size === 9 ? '9×9' : '4×4 Mini'}
                 </button>
               ))}
             </div>
@@ -518,7 +590,7 @@ function App() {
                 <button
                   key={d}
                   onClick={() => generateNewGame(d)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase transition-all touch-manipulation active:scale-95 ${
+                  className={`min-h-[44px] px-3 py-2 rounded-xl text-xs font-black uppercase transition-all touch-manipulation active:scale-95 ${
                     difficulty === d
                       ? 'bg-amber-500 text-white shadow'
                       : 'bg-white/5 opacity-55 hover:opacity-100'
@@ -540,7 +612,7 @@ function App() {
               </span>
               <button
                 onClick={togglePause}
-                className="p-1 rounded bg-black/10 hover:bg-black/30 border border-white/5 text-xs transition-colors"
+                className="min-h-[44px] min-w-[44px] p-2 rounded bg-black/10 hover:bg-black/30 border border-white/5 text-base transition-colors"
                 title={isPaused ? "Resume" : "Pause"}
               >
                 {isPaused ? '▶️' : '⏸️'}
@@ -573,7 +645,7 @@ function App() {
             <button
               onClick={triggerHint}
               disabled={!selectedCell || gameStatus !== 'playing' || isPaused}
-              className={`mt-1.5 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all ${
+              className={`mt-1.5 min-h-[44px] px-3 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all ${
                 selectedCell && gameStatus === 'playing'
                   ? 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30'
                   : 'opacity-30 cursor-not-allowed bg-white/5'
@@ -704,15 +776,15 @@ function App() {
                 </div>
               )}
 
-              {/* 9x9 Grid Layout */}
-              <div className="grid grid-cols-3 grid-rows-3 gap-1.5 w-full h-full bg-transparent">
-                {[0, 1, 2].map((blockRow) => (
-                  [0, 1, 2].map((blockCol) => (
-                    <div key={`${blockRow}-${blockCol}`} className="grid grid-cols-3 grid-rows-3 bg-black/10 rounded-xl overflow-hidden gap-[1px]">
-                      {[0, 1, 2].map((row) => (
-                        [0, 1, 2].map((col) => {
-                          const r = blockRow * 3 + row;
-                          const c = blockCol * 3 + col;
+              {/* Sudoku Grid Layout (9x9 or 4x4 Mini) */}
+              <div className={`grid ${boxSize === 2 ? 'grid-cols-2 grid-rows-2' : 'grid-cols-3 grid-rows-3'} gap-1.5 w-full h-full bg-transparent`}>
+                {Array.from({ length: boxSize }, (_, blockRow) => (
+                  Array.from({ length: boxSize }, (_, blockCol) => (
+                    <div key={`${blockRow}-${blockCol}`} className={`grid ${boxSize === 2 ? 'grid-cols-2 grid-rows-2' : 'grid-cols-3 grid-rows-3'} bg-black/10 rounded-xl overflow-hidden gap-[1px]`}>
+                      {Array.from({ length: boxSize }, (_, row) => (
+                        Array.from({ length: boxSize }, (_, col) => {
+                          const r = blockRow * boxSize + row;
+                          const c = blockCol * boxSize + col;
                           const isClue = puzzle[r]?.[c] !== 0;
                           
                           // Active value checks
@@ -727,8 +799,8 @@ function App() {
                           const isSameRow = selectedCell && selectedCell.r === r;
                           const isSameCol = selectedCell && selectedCell.c === c;
                           const isSameBlock = selectedCell &&
-                            Math.floor(selectedCell.r / 3) === blockRow &&
-                            Math.floor(selectedCell.c / 3) === blockCol;
+                            Math.floor(selectedCell.r / boxSize) === blockRow &&
+                            Math.floor(selectedCell.c / boxSize) === blockCol;
                           
                           // Identical matching numbers highlight
                           const selectedVal = selectedCell ? userGrid[selectedCell.r]?.[selectedCell.c] : 0;
@@ -739,7 +811,7 @@ function App() {
                               key={`${r}-${c}`}
                               onClick={() => handleCellSelect(r, c)}
                               className={`
-                                flex items-center justify-center font-black text-2xl md:text-3xl focus:outline-none transition-all touch-manipulation active:scale-95 duration-100
+                                flex items-center justify-center font-black ${gridSize === 4 ? 'text-4xl md:text-5xl' : 'text-2xl md:text-3xl'} focus:outline-none transition-all touch-manipulation active:scale-95 duration-100
                                 ${isClue ? 'grid-cell-clue' : 'grid-cell-empty'}
                                 ${isSelected ? 'cell-selected scale-[0.98]' : ''}
                                 ${!isSelected && (isSameRow || isSameCol || isSameBlock) ? 'cell-highlight' : ''}
@@ -751,7 +823,7 @@ function App() {
                             >
                               {displayVal !== 0 ? (
                                 gameMode === 'quest' ? (
-                                  <span className="text-xl md:text-2xl drop-shadow">{QUEST_MAP[displayVal]}</span>
+                                  <span className={`${gridSize === 4 ? 'text-3xl md:text-4xl' : 'text-xl md:text-2xl'} drop-shadow`}>{QUEST_MAP[displayVal]}</span>
                                 ) : (
                                   displayVal
                                 )
@@ -782,8 +854,8 @@ function App() {
               </div>
 
               {/* Grid of Keypad Input Buttons */}
-              <div className="grid grid-cols-3 gap-3">
-                {Array.from({ length: 9 }, (_, i) => i + 1).map((val) => {
+              <div className={`grid ${gridSize === 4 ? 'grid-cols-2' : 'grid-cols-3'} gap-3`}>
+                {Array.from({ length: gridSize }, (_, i) => i + 1).map((val) => {
                   return (
                     <button
                       key={val}
@@ -810,9 +882,17 @@ function App() {
                 })}
               </div>
 
-              {/* Utility row (Clear cell, Toggle Answer) */}
+              {/* Utility row (Undo, Clear cell, Reset game) */}
               <div className="flex gap-3">
-                
+
+                <button
+                  onClick={handleUndo}
+                  disabled={history.length === 0 || gameStatus === 'victory' || isPaused || isGenerating}
+                  className="flex-1 py-4 md:py-5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 rounded-2xl font-bold text-sm md:text-base hover:bg-indigo-500 hover:text-white transition-all btn-tactile disabled:opacity-30 disabled:cursor-not-allowed touch-manipulation"
+                >
+                  ↩️ Undo
+                </button>
+
                 <button
                   onClick={() => selectedCell && handleCellClear(selectedCell.r, selectedCell.c)}
                   disabled={!selectedCell || gameStatus !== 'playing' || isPaused}
@@ -834,7 +914,15 @@ function App() {
 
             {/* Quick action utility shortcuts */}
             <div className="flex flex-col gap-3">
-              
+
+              <button
+                onClick={togglePause}
+                disabled={gameStatus !== 'playing' || isGenerating}
+                className="w-full py-4 bg-violet-600/10 hover:bg-violet-600 border border-violet-500/20 hover:text-white text-violet-300 font-bold rounded-2xl transition-all btn-tactile text-sm md:text-base flex items-center justify-center gap-2 touch-manipulation disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                {isPaused ? '▶️ Resume Game' : '⏸️ Pause Game'}
+              </button>
+
               <button
                 onClick={handlePrint}
                 className="w-full py-4 bg-cyan-600/10 hover:bg-cyan-600 border border-cyan-500/20 hover:text-white text-cyan-400 font-bold rounded-2xl transition-all btn-tactile text-sm md:text-base flex items-center justify-center gap-2 touch-manipulation"
@@ -866,7 +954,7 @@ function App() {
             <span>•</span>
             <span>Vibe-Coded by Patrick Kajirian</span>
           </div>
-          <p>Controls: Use Mouse clicks, Keyboard Numbers (1-9), Erase (Backspace), and Navigation (Arrows).</p>
+          <p>Controls: Mouse clicks, Keyboard Numbers (1–9, or 1–4 in Mini mode), Erase (Backspace), Undo (Ctrl+Z), Pause (P), and Navigation (Arrows).</p>
         </footer>
 
       </div>
@@ -880,7 +968,7 @@ function App() {
         <div className="flex justify-between items-end border-b-4 border-black pb-4">
           <div>
             <h1 className="text-5xl font-black uppercase tracking-tight m-0 p-0 leading-none">KIDUKU</h1>
-            <p className="text-lg font-bold mt-1 text-gray-700">Arcade Sudoku Challenge // Level: <span className="uppercase">{difficulty}</span></p>
+            <p className="text-lg font-bold mt-1 text-gray-700">Arcade Sudoku Challenge // Level: <span className="uppercase">{difficulty}</span> • {gridSize}×{gridSize}</p>
           </div>
           <div className="text-right flex flex-col gap-2 w-72">
             <div className="flex items-end border-b-2 border-black pb-0.5">
@@ -894,18 +982,18 @@ function App() {
           </div>
         </div>
 
-        {/* Crisp Printable 9x9 grid */}
+        {/* Crisp Printable grid */}
         <div className="my-10 flex justify-center">
           <div className="w-[140mm] h-[140mm] border-4 border-black box-border flex flex-col bg-white">
-            {[0, 1, 2].map((blockRow) => (
+            {Array.from({ length: boxSize }, (_, blockRow) => (
               <div key={`p-brow-${blockRow}`} className="flex-1 flex border-b-4 border-black last:border-b-0">
-                {[0, 1, 2].map((blockCol) => (
+                {Array.from({ length: boxSize }, (_, blockCol) => (
                   <div key={`p-bcol-${blockCol}`} className="flex-1 flex flex-col border-r-4 border-black last:border-r-0">
-                    {[0, 1, 2].map((row) => (
+                    {Array.from({ length: boxSize }, (_, row) => (
                       <div key={`p-row-${row}`} className="flex-1 flex border-b-[1px] border-black last:border-b-0">
-                        {[0, 1, 2].map((col) => {
-                          const r = blockRow * 3 + row;
-                          const c = blockCol * 3 + col;
+                        {Array.from({ length: boxSize }, (_, col) => {
+                          const r = blockRow * boxSize + row;
+                          const c = blockCol * boxSize + col;
                           const isClue = puzzle[r]?.[c] !== 0;
                           
                           // In printout, if answer is shown, overlay it, else draw user current inputs

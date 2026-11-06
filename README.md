@@ -16,9 +16,13 @@
   * `🕹️ Retro Arcade`: Green-tinted screen lines (`crt-overlay`) with a pixelated retro gaming font.
   * `🌐 Minimalist Glass`: Smooth frosted-glass overlays floating over rich pastel gradients.
 * **❤️ Shield / Heart Lives**: Track performance with three gaming hearts. Entering incorrect inputs shakes the grid and removes a heart.
+* **↩️ Undo**: Take back any move — placements, clears, hints, even mistakes (lives included). Tap the Undo button or press Ctrl/Cmd+Z.
+* **⏸️ Pause**: Pause stops the timer and covers the board so nobody can peek. Big Pause button in the controls, the ⏸️ by the timer, or press P.
+* **🧩 4×4 Mini Mode**: A smaller 4×4 board (2×2 boxes, numbers 1–4) for younger players or a quick game. Switch between 9×9 and 4×4 Mini in the top control panel — difficulty, Quest Mode, and printable worksheets all work in Mini mode too.
 * **💡 Tactical Hint Lightbulb**: Trapped on a difficult square? Select the cell and click the hint button to mathematically reveal the correct solution (increments a hint count).
 * **📈 Victory Star Ratings**: Completing a board displays an arcade summary, tracking elapsed time, total mistakes, and hints used to award a 1, 2, or 3-star gaming score.
 * **🖨️ Printable Worksheets**: Dedicated grayscale print view strips all gaming HUDs and colors, translating quest items back to crisp, clean high-contrast numbers for perfect home printing.
+* **📲 Installable App (PWA)**: Kiduku is a Progressive Web App — install it on a tablet or phone home screen and play offline. On iPad, open the game in Safari, tap Share → Add to Home Screen. On Android/Chrome, tap the Install prompt (or ⋮ → Install app). The service worker caches the game shell, so it opens even with no connection. App icons are generated at build time by `scripts/generate-icons.mjs` (pure Node, no extra dependencies). Fonts are bundled with the app (no Google Fonts CDN), so the game looks right offline too.
 
 ---
 

@@ -1,14 +1,39 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Self-hosted fonts (bundled via @fontsource, no Google Fonts CDN needed —
+   the game keeps its look offline and never phones home for type). */
+@theme {
+  --font-fredoka: "Fredoka Variable", "Fredoka", sans-serif;
+  --font-outfit: "Outfit Variable", "Outfit", sans-serif;
+  --font-press-start: "Press Start 2P", monospace;
+}
 
 @layer base {
+  html {
+    /* Stop pull-to-refresh / overscroll from reloading a game mid-puzzle. */
+    overscroll-behavior: none;
+  }
+
   body {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Outfit Variable', 'Outfit', sans-serif;
     transition: background-color 0.4s ease, color 0.4s ease;
     touch-action: manipulation;
     user-select: none;
     -webkit-user-select: none;
+    /* No grey flash on tap (iOS) and no long-press callout menu. */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    overscroll-behavior: none;
+  }
+
+  /* Full-height shell that respects phone notches / home indicators and
+     uses the dynamic viewport so the mobile URL bar doesn't jump the game. */
+  .app-shell {
+    min-height: 100dvh;
+    padding-top: max(1.5rem, env(safe-area-inset-top));
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
   }
 
   @media print {
@@ -19,7 +44,7 @@
     html, body {
       margin: 0 !important;
       padding: 0 !important;
-      font-family: 'Outfit', sans-serif !important;
+      font-family: 'Outfit Variable', 'Outfit', sans-serif !important;
     }
     body {
       print-color-adjust: exact;
@@ -99,7 +124,7 @@
 .theme-cyber {
   background: radial-gradient(circle at center, #0b071e 0%, #03000a 100%);
   color: #00ffcc;
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Outfit Variable', 'Outfit', sans-serif;
 }
 
 .theme-cyber .glass-panel {
@@ -245,12 +270,16 @@
    ANIMATIONS & TRANSITIONS
    ========================================================================== */
 
-/* Springy bounce on hover/click */
+/* Springy bounce on hover/click.
+   Hover lift is scoped to devices with a real hover pointer: on touch
+   screens :hover sticks after a tap and leaves buttons looking "stuck". */
 .btn-tactile {
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-.btn-tactile:hover {
-  transform: translateY(-2px) scale(1.02);
+@media (hover: hover) {
+  .btn-tactile:hover {
+    transform: translateY(-2px) scale(1.02);
+  }
 }
 .btn-tactile:active {
   transform: translateY(2px) scale(0.97);

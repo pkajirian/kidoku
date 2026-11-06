@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 
+# Generated PWA icons (rebuilt by scripts/generate-icons.mjs on dev/build)
+public/icons/
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -1,15 +1,20 @@
 {
   "name": "kidoku",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "predev": "node scripts/generate-icons.mjs",
     "build": "tsc -b && vite build",
+    "prebuild": "node scripts/generate-icons.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource-variable/fredoka": "^5.2.5",
+    "@fontsource-variable/outfit": "^5.2.5",
+    "@fontsource/press-start-2p": "^5.2.5",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },
