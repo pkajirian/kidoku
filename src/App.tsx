@@ -825,7 +825,7 @@ function App() {
                                 gameMode === 'quest' ? (
                                   <span className={`${gridSize === 4 ? 'text-3xl md:text-4xl' : 'text-xl md:text-2xl'} drop-shadow`}>{QUEST_MAP[displayVal]}</span>
                                 ) : (
-                                  displayVal
+                                  <span className="cell-digit">{displayVal}</span>
                                 )
                               ) : ''}
                             </button>
@@ -875,7 +875,7 @@ function App() {
                           <span className="text-[9px] font-mono opacity-50 font-normal mt-0.5">#{val}</span>
                         </>
                       ) : (
-                        val
+                        <span className="keypad-digit">{val}</span>
                       )}
                     </button>
                   );
@@ -950,7 +950,7 @@ function App() {
         {/* Global Footer */}
         <footer className="mt-12 py-6 border-t border-white/5 text-center text-xs opacity-50 flex flex-col items-center gap-2">
           <div className="flex items-center gap-2">
-            <span>Version 0.2.0 (8+ Arcade Edition)</span>
+            <span>Version 0.2.3 (8+ Arcade Edition)</span>
             <span>•</span>
             <span>Vibe-Coded by Patrick Kajirian</span>
           </div>
