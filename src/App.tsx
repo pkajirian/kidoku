@@ -780,7 +780,7 @@ function App() {
               <div className={`grid ${boxSize === 2 ? 'grid-cols-2 grid-rows-2' : 'grid-cols-3 grid-rows-3'} gap-1.5 w-full h-full bg-transparent`}>
                 {Array.from({ length: boxSize }, (_, blockRow) => (
                   Array.from({ length: boxSize }, (_, blockCol) => (
-                    <div key={`${blockRow}-${blockCol}`} className={`grid ${boxSize === 2 ? 'grid-cols-2 grid-rows-2' : 'grid-cols-3 grid-rows-3'} grid-block bg-black/10 rounded-xl overflow-hidden gap-[1px]`}>
+                    <div key={`${blockRow}-${blockCol}`} className={`grid ${boxSize === 2 ? 'grid-cols-2 grid-rows-2' : 'grid-cols-3 grid-rows-3'} bg-black/10 rounded-xl overflow-hidden gap-[1px]`}>
                       {Array.from({ length: boxSize }, (_, row) => (
                         Array.from({ length: boxSize }, (_, col) => {
                           const r = blockRow * boxSize + row;
