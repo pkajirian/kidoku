@@ -193,7 +193,28 @@ function App() {
   const [selectedCell, setSelectedCell] = useState<{ r: number; c: number } | null>(null);
   
   // Game Customizations
-  const [theme, setTheme] = useState<ThemeType>('cyber'); // Default to Cyberpunk Neon (ages 8+)
+  // Theme: Glass by default on first visit, then remember the player's last
+  // pick in localStorage so the next visit resumes in that theme.
+  const THEME_STORAGE_KEY = 'kidoku-theme';
+  const isTheme = (v: string | null): v is ThemeType =>
+    v === 'glass' || v === 'cyber' || v === 'retro';
+  const [theme, setTheme] = useState<ThemeType>(() => {
+    try {
+      const saved = window.localStorage.getItem(THEME_STORAGE_KEY);
+      return isTheme(saved) ? saved : 'glass';
+    } catch {
+      return 'glass';
+    }
+  });
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch {
+      // Storage unavailable (e.g. private mode) — the theme just won't
+      // persist this session; the game still works.
+    }
+  }, [theme]);
   const [gameMode, setGameMode] = useState<GameModeType>('numbers');
   const [showSolution, setShowSolution] = useState(false);
   
@@ -950,7 +971,7 @@ function App() {
         {/* Global Footer */}
         <footer className="mt-12 py-6 border-t border-white/5 text-center text-xs opacity-50 flex flex-col items-center gap-2">
           <div className="flex items-center gap-2">
-            <span>Version 0.2.3 (8+ Arcade Edition)</span>
+            <span>Version 0.2.4 (8+ Arcade Edition)</span>
             <span>•</span>
             <span>Vibe-Coded by Patrick Kajirian</span>
           </div>
