@@ -141,17 +141,23 @@
   box-shadow: 0 0 20px rgba(255, 0, 127, 0.4);
 }
 
+/* Inner grid lines: the 1px gaps between cells show this background, so it
+   must be a visible neon pink, not near-black. */
+.theme-cyber .grid-block {
+  background: rgba(255, 0, 127, 0.6);
+}
+
 .theme-cyber .grid-cell-empty {
   background: #0d0620;
   color: #00ffcc;
-  border-color: rgba(255, 0, 127, 0.2);
+  border: 1px solid rgba(255, 0, 127, 0.6);
   text-shadow: 0 0 8px rgba(0, 255, 204, 0.6);
 }
 
 .theme-cyber .grid-cell-clue {
   background: #170d35;
   color: #ffff00;
-  border-color: rgba(255, 0, 127, 0.2);
+  border: 1px solid rgba(255, 0, 127, 0.6);
   text-shadow: 0 0 8px rgba(255, 255, 0, 0.6);
 }
 
@@ -208,10 +214,16 @@
   border-radius: 0px !important;
 }
 
+/* Inner grid lines: the 1px gaps between cells show this background, so it
+   must be a visible phosphor green, not near-black. */
+.theme-retro .grid-block {
+  background: rgba(57, 255, 20, 0.45);
+}
+
 .theme-retro .grid-cell-empty {
   background: #050a04;
   color: #39ff14;
-  border: 1px solid #1a3010;
+  border: 1px solid rgba(57, 255, 20, 0.5);
   border-radius: 0px !important;
   text-shadow: 0 0 4px #39ff14;
 }
@@ -219,7 +231,7 @@
 .theme-retro .grid-cell-clue {
   background: #121e0d;
   color: #00ffff;
-  border: 1px solid #1a3010;
+  border: 1px solid rgba(57, 255, 20, 0.5);
   border-radius: 0px !important;
   text-shadow: 0 0 4px #00ffff;
 }
